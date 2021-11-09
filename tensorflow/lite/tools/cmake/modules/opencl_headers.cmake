@@ -21,10 +21,11 @@ include(FetchContent)
 
 OverridableFetchContent_Declare(
   opencl_headers
-  GIT_REPOSITORY https://github.com/KhronosGroup/OpenCL-Headers
-  # Sync with tensorflow/third_party/opencl_headers/workspace.bzl
-  GIT_TAG 0d5f18c6e7196863bc1557a693f1509adfcee056
-  GIT_PROGRESS TRUE
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/opencl_headers.tar.gz"
+  # GIT_REPOSITORY https://github.com/KhronosGroup/OpenCL-Headers
+  # # Sync with tensorflow/third_party/opencl_headers/workspace.bzl
+  # GIT_TAG 0d5f18c6e7196863bc1557a693f1509adfcee056
+  # GIT_PROGRESS TRUE
   PREFIX "${CMAKE_BINARY_DIR}"
   SOURCE_DIR "${CMAKE_BINARY_DIR}/opencl_headers"
 )

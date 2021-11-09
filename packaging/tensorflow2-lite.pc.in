@@ -1,0 +1,6 @@
+Name: tensorflow lite
+Description: tensorflow lite static library
+Version: 2.7.0
+Requires: flatbuffers
+Libs: -L@libdir@ -ltensorflow2-lite -lflatbuffers
+Cflags: -I@includedir@
