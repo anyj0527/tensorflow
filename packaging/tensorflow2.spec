@@ -49,6 +49,13 @@ Requires: flatbuffers-devel >= 1.12.0
 %description lite-devel
 TensorFlow Lite development headers and object file
 
+%package lite-util
+Summary: TensorFlow Lite developer util
+Requires: flatbuffers-devel >= 1.12.0
+
+%description lite-util
+It includes a executable to benchmark any tflite model
+
 %prep
 %setup -q
 cp %{SOURCE1001} .
@@ -100,6 +107,7 @@ cmake \
   ../tensorflow/lite
 
 cmake --build . %{?_smp_mflags}
+cmake --build . %{?_smp_mflags} -t benchmark_model
 
 popd
 
@@ -121,6 +129,7 @@ sed -i 's:@libdir@:%{_libdir}:g
 # Put the generated files into the buildroot folder
 ## install built static library and benchmark_model executable
 install -m 0644 ./build/libtensorflow-lite-bundled.a %{buildroot}%{_libdir}/libtensorflow2-lite.a
+install -m 0655 ./build/tools/benchmark/benchmark_model %{buildroot}%{_bindir}/tflite_benchmark_model
 
 ## install headers
 pushd tensorflow/lite
@@ -151,6 +160,10 @@ install -m 0644 tensorflow2-lite.pc.in %{buildroot}%{_libdir}/pkgconfig/tensorfl
 %{_includedir}/tensorflow2/lite
 %{_includedir}/tensorflow2/tensorflow
 
+%files lite-util
+%{_bindir}/tflite_benchmark_model
+
 %changelog
 * Wed Nov 10 2021 Yongjoo Ahn <yongjoo1.ahn@samsung.com>
- - Initial pcakage te use TensorFlow Lite v2.7.0
+ - Initial package te use TensorFlow Lite v2.7.0
+ - Add an executable "tflite_benchmark_model" for profiling

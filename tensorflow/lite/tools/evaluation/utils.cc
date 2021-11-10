@@ -137,36 +137,36 @@ TfLiteDelegatePtr CreateGPUDelegate() {
 
 TfLiteDelegatePtr CreateHexagonDelegate(
     const std::string& library_directory_path, bool profiling) {
-#if !defined(__APPLE__) && (defined(__arm__) || defined(__aarch64__))
-  TfLiteHexagonDelegateOptions options = {0};
-  options.print_graph_profile = profiling;
-  return CreateHexagonDelegate(&options, library_directory_path);
-#else
+// #if !defined(__APPLE__) && (defined(__arm__) || defined(__aarch64__))
+//   TfLiteHexagonDelegateOptions options = {0};
+//   options.print_graph_profile = profiling;
+//   return CreateHexagonDelegate(&options, library_directory_path);
+// #else
   return CreateNullDelegate();
-#endif  // defined(__arm__)
+// #endif  // defined(__arm__)
 }
 
-#if !defined(__APPLE__) && (defined(__arm__) || defined(__aarch64__))
-TfLiteDelegatePtr CreateHexagonDelegate(
-    const TfLiteHexagonDelegateOptions* options,
-    const std::string& library_directory_path) {
-  if (library_directory_path.empty()) {
-    TfLiteHexagonInit();
-  } else {
-    TfLiteHexagonInitWithPath(library_directory_path.c_str());
-  }
+// #if !defined(__APPLE__) && (defined(__arm__) || defined(__aarch64__))
+// TfLiteDelegatePtr CreateHexagonDelegate(
+//     const TfLiteHexagonDelegateOptions* options,
+//     const std::string& library_directory_path) {
+//   if (library_directory_path.empty()) {
+//     TfLiteHexagonInit();
+//   } else {
+//     TfLiteHexagonInitWithPath(library_directory_path.c_str());
+//   }
 
-  TfLiteDelegate* delegate = TfLiteHexagonDelegateCreate(options);
-  if (!delegate) {
-    TfLiteHexagonTearDown();
-    return CreateNullDelegate();
-  }
-  return TfLiteDelegatePtr(delegate, [](TfLiteDelegate* delegate) {
-    TfLiteHexagonDelegateDelete(delegate);
-    TfLiteHexagonTearDown();
-  });
-}
-#endif
+//   TfLiteDelegate* delegate = TfLiteHexagonDelegateCreate(options);
+//   if (!delegate) {
+//     TfLiteHexagonTearDown();
+//     return CreateNullDelegate();
+//   }
+//   return TfLiteDelegatePtr(delegate, [](TfLiteDelegate* delegate) {
+//     TfLiteHexagonDelegateDelete(delegate);
+//     TfLiteHexagonTearDown();
+//   });
+// }
+// #endif
 
 #if defined(TFLITE_WITHOUT_XNNPACK)
 TfLiteDelegatePtr CreateXNNPACKDelegate(int num_threads) {
