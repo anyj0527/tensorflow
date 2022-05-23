@@ -1,0 +1,5 @@
+Name: tensorflow lite
+Description: tensorflow lite static library
+Version: 2.8.1
+Libs: -L@libdir@ -ltensorflow2-lite
+Cflags: -I@includedir@

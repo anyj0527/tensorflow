@@ -21,9 +21,10 @@ endif()
 
 OverridableFetchContent_Declare(
   neon2sse
-  URL https://storage.googleapis.com/mirror.tensorflow.org/github.com/intel/ARM_NEON_2_x86_SSE/archive/1200fe90bb174a6224a525ee60148671a786a71f.tar.gz
-  # Sync with tensorflow/workspace2.bzl
-  URL_HASH SHA256=213733991310b904b11b053ac224fee2d4e0179e46b52fe7f8735b8831e04dcc
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/neon2sse.tar.gz"
+  # URL https://storage.googleapis.com/mirror.tensorflow.org/github.com/intel/ARM_NEON_2_x86_SSE/archive/1200fe90bb174a6224a525ee60148671a786a71f.tar.gz
+  # # Sync with tensorflow/workspace2.bzl
+  # URL_HASH SHA256=213733991310b904b11b053ac224fee2d4e0179e46b52fe7f8735b8831e04dcc
   SOURCE_DIR "${CMAKE_BINARY_DIR}/neon2sse"
 )
 
