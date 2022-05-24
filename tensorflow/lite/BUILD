@@ -1203,16 +1203,17 @@ tflite_cc_shared_object(
         ],
         "//tensorflow:windows": [],
         "//conditions:default": [
-            "-Wl,-z,defs",
-            "-Wl,--version-script,$(location //tensorflow/lite:tflite_version_script.lds)",
+            # "-Wl,-z,defs",
+            # "-Wl,--version-script,$(location //tensorflow/lite:tflite_version_script.lds)",
         ],
     }),
     per_os_targets = True,
     deps = [
         ":framework",
-        ":tflite_exported_symbols.lds",
-        ":tflite_version_script.lds",
+        # ":tflite_exported_symbols.lds",
+        # ":tflite_version_script.lds",
         "//tensorflow/lite/kernels:builtin_ops_all_linked",
+        "//tensorflow/lite/delegates/flex:delegate",
     ],
 )
 
