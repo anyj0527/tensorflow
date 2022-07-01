@@ -1,0 +1,5 @@
+tensorflow2 (2.8.1) unstable xenial bionic; urgency=medium
+
+  * Added a debian packaging to support version 2.8.1 of TF-Lite
+
+ -- Yongjoo Ahn <yongjoo1.ahn@samsung.com>  Mon, 4 Jul 2022 10:00:00 +0900
