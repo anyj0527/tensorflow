@@ -21,11 +21,11 @@ include(FetchContent)
 
 OverridableFetchContent_Declare(
   opengl_headers
-  GIT_REPOSITORY https://github.com/KhronosGroup/OpenGL-Registry.git
-  # No reference in TensorFlow Bazel rule since it's used for GPU Delegate
-  # build without using Android NDK.
-  GIT_TAG 0cb0880d91581d34f96899c86fc1bf35627b4b81
-  GIT_PROGRESS TRUE
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/opengl_headers.tar.gz"
+  # # No reference in TensorFlow Bazel rule since it's used for GPU Delegate
+  # # build without using Android NDK.
+  # GIT_TAG 0cb0880d91581d34f96899c86fc1bf35627b4b81
+  # GIT_PROGRESS TRUE
   PREFIX "${CMAKE_BINARY_DIR}"
   SOURCE_DIR "${CMAKE_BINARY_DIR}/opengl_headers"
 )

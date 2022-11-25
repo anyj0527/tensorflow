@@ -22,10 +22,10 @@ include(FetchContent)
 
 OverridableFetchContent_Declare(
   fp16_headers
-  GIT_REPOSITORY https://github.com/Maratyszcza/FP16
-  # Sync with https://github.com/google/XNNPACK/blob/master/cmake/DownloadFP16.cmake
-  GIT_TAG 0a92994d729ff76a58f692d3028ca1b64b145d91
-  GIT_PROGRESS TRUE
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/fp16.tar.gz"
+  # # Sync with https://github.com/google/XNNPACK/blob/master/cmake/DownloadFP16.cmake
+  # GIT_TAG 0a92994d729ff76a58f692d3028ca1b64b145d91
+  # GIT_PROGRESS TRUE
   PREFIX "${CMAKE_BINARY_DIR}"
   SOURCE_DIR "${CMAKE_BINARY_DIR}/fp16_headers"
 )

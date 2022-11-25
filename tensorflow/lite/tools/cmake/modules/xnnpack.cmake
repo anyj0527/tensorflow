@@ -20,11 +20,83 @@ endif()
 include(FetchContent)
 
 OverridableFetchContent_Declare(
+  cpuinfo
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/cpuinfo.tar.gz"
+  PREFIX "${CMAKE_BINARY_DIR}"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/cpuinfo"
+)
+OverridableFetchContent_GetProperties(cpuinfo)
+if(NOT cpuinfo_POPULATED)
+  OverridableFetchContent_Populate(cpuinfo)
+endif()
+set(CPUINFO_SOURCE_DIR "${CMAKE_BINARY_DIR}/cpuinfo")
+
+OverridableFetchContent_Declare(
+  clog
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/clog.tar.gz"
+  PREFIX "${CMAKE_BINARY_DIR}"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/clog"
+)
+OverridableFetchContent_GetProperties(clog)
+if(NOT clog_POPULATED)
+  OverridableFetchContent_Populate(clog)
+endif()
+set(CLOG_SOURCE_DIR "${CMAKE_BINARY_DIR}/clog")
+
+OverridableFetchContent_Declare(
+  fp16
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/fp16.tar.gz"
+  PREFIX "${CMAKE_BINARY_DIR}"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/fp16"
+)
+OverridableFetchContent_GetProperties(fp16)
+if(NOT fp16_POPULATED)
+  OverridableFetchContent_Populate(fp16)
+endif()
+set(FP16_SOURCE_DIR "${CMAKE_BINARY_DIR}/fp16")
+
+OverridableFetchContent_Declare(
+  psimd
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/psimd.tar.gz"
+  PREFIX "${CMAKE_BINARY_DIR}"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/psimd"
+)
+OverridableFetchContent_GetProperties(psimd)
+if(NOT psimd_POPULATED)
+  OverridableFetchContent_Populate(psimd)
+endif()
+set(PSIMD_SOURCE_DIR "${CMAKE_BINARY_DIR}/psimd")
+
+OverridableFetchContent_Declare(
+  fxdiv
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/fxdiv.tar.gz"
+  PREFIX "${CMAKE_BINARY_DIR}"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/fxdiv"
+)
+OverridableFetchContent_GetProperties(fxdiv)
+if(NOT fxdiv_POPULATED)
+  OverridableFetchContent_Populate(fxdiv)
+endif()
+set(FXDIV_SOURCE_DIR "${CMAKE_BINARY_DIR}/fxdiv")
+
+OverridableFetchContent_Declare(
+  pthreadpool
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/pthreadpool.tar.gz"
+  PREFIX "${CMAKE_BINARY_DIR}"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/pthreadpool"
+)
+OverridableFetchContent_GetProperties(pthreadpool)
+if(NOT pthreadpool_POPULATED)
+  OverridableFetchContent_Populate(pthreadpool)
+endif()
+set(PTHREADPOOL_SOURCE_DIR "${CMAKE_BINARY_DIR}/pthreadpool")
+
+OverridableFetchContent_Declare(
   xnnpack
-  GIT_REPOSITORY https://github.com/google/XNNPACK
-  # Sync with tensorflow/workspace2.bzl
-  GIT_TAG e8f74a9763aa36559980a0c2f37f587794995622
-  GIT_PROGRESS TRUE
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/XNNPACK.tar.gz"
+  # # Sync with tensorflow/workspace2.bzl
+  # GIT_TAG e8f74a9763aa36559980a0c2f37f587794995622
+  # GIT_PROGRESS TRUE
   PREFIX "${CMAKE_BINARY_DIR}"
   SOURCE_DIR "${CMAKE_BINARY_DIR}/xnnpack"
 )
