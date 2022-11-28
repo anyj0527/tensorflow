@@ -62,6 +62,10 @@ Summary: TensorFlow Lite developer util
 %description lite-util
 It includes a executable to benchmark any tflite model
 
+%define USE_XNNPACK   "ON"
+%define USE_OPENCL    "ON"
+%define SHARED_LIB    "OFF"
+
 %prep
 %setup -q
 cp %{SOURCE1001} .
@@ -105,10 +109,14 @@ EXTRA_CXXFLAGS="${CXXFLAGS}"
   %ifarch armv7l
     EXTRA_CFLAGS="${EXTRA_CFLAGS} -mfloat-abi=softfp -march=armv7-a -mfpu=neon-vfpv4 -funsafe-math-optimizations -mfp16-format=ieee"
     EXTRA_CXXFLAGS="${EXTRA_CXXFLAGS} -mfloat-abi=softfp -march=armv7-a -mfpu=neon-vfpv4 -funsafe-math-optimizations -mfp16-format=ieee"
+    # To build XNNPACK in 32bit, I guess, recent version of GCC is required.
+    %define USE_XNNPACK "OFF"
   %endif
   %ifarch armv7hl
     EXTRA_CFLAGS="${EXTRA_CFLAGS} -mfloat-abi=hard -march=armv7-a -mfpu=neon-vfpv4 -funsafe-math-optimizations -mfp16-format=ieee"
     EXTRA_CXXFLAGS="${EXTRA_CXXFLAGS} -mfloat-abi=hard -march=armv7-a -mfpu=neon-vfpv4 -funsafe-math-optimizations -mfp16-format=ieee"
+    # To build XNNPACK in 32bit, I guess, recent version of GCC is required.
+    %define USE_XNNPACK "OFF"
   %endif
 %endif
 
@@ -129,8 +137,9 @@ cmake \
   -GNinja \
   -DCMAKE_C_FLAGS="${EXTRA_CFLAGS}" \
   -DCMAKE_CXX_FLAGS="${EXTRA_CXXFLAGS}" \
-  -DTFLITE_ENABLE_XNNPACK=ON \
-  -DTFLITE_ENABLE_GPU=ON \
+  -DTFLITE_BUILD_SHARED_LIB="%{SHARED_LIB}" \
+  -DTFLITE_ENABLE_XNNPACK="%{USE_XNNPACK}" \
+  -DTFLITE_ENABLE_GPU="%{USE_OPENCL}" \
   ../tensorflow/lite
 
 cmake --build . %{?_smp_mflags}
@@ -153,10 +162,13 @@ cp %{SOURCE1002} .
 sed -i 's:@libdir@:%{_libdir}:g
     s:@includedir@:%{_includedir}/tensorflow2/:g' ./tensorflow2-lite.pc.in
 
-
 # Put the generated files into the buildroot folder
 ## install built static library and benchmark binary
-install -m 0644 ./build/libtensorflow-lite-bundled.a %{buildroot}%{_libdir}/libtensorflow2-lite.a
+%if %{SHARED_LIB} == "ON"
+  install -m 0644 ./build/libtensorflow-lite.so %{buildroot}%{_libdir}/libtensorflow2-lite.so
+%else
+  install -m 0644 ./build/libtensorflow-lite-bundled.a %{buildroot}%{_libdir}/libtensorflow2-lite.a
+%endif
 install -m 0655 ./build/tools/benchmark/benchmark_model %{buildroot}%{_bindir}/tflite_benchmark_model
 
 ## install headers
@@ -186,7 +198,11 @@ install -m 0644 tensorflow2-lite.pc.in %{buildroot}%{_libdir}/pkgconfig/tensorfl
 %defattr(-,root,root,-)
 %manifest tensorflow2.manifest
 %license LICENSE
-%{_libdir}/libtensorflow2-lite.a
+%if %{SHARED_LIB} == "ON"
+  %{_libdir}/libtensorflow2-lite.so
+%else
+  %{_libdir}/libtensorflow2-lite.a
+%endif
 %{_libdir}/pkgconfig/tensorflow2-lite.pc
 %{_includedir}/tensorflow2/lite
 %{_includedir}/tensorflow2/tensorflow
