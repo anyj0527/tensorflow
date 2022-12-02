@@ -80,6 +80,7 @@ if(TFLITE_KERNEL_TEST AND ${CMAKE_CROSSCOMPILING})
                         Please specify it using -DTFLITE_HOST_TOOLS_DIR=<flatc_dir_path> launch argument.")
   endif()
 endif()
+option(TFLITE_BUILD_SHARED_LIB "Build shared library instead of static" OFF)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -208,6 +209,9 @@ list(FILTER TFLITE_SRCS EXCLUDE REGEX ".*tflite_with_xnnpack\\.cc$")
 
 # Exclude Flex related files.
 list(FILTER TFLITE_SRCS EXCLUDE REGEX ".*with_selected_ops\\.cc$")
+
+# Exclude tensorflow_profiler_logger files.
+list(FILTER TFLITE_SRCS EXCLUDE REGEX ".*tensorflow_profiler_logger\\.cc$")
 
 if(_TFLITE_ENABLE_MMAP)
   list(FILTER TFLITE_SRCS EXCLUDE REGEX ".*mmap_allocation_disabled\\.cc$")
@@ -508,9 +512,31 @@ set(_ALL_TFLITE_SRCS
   ${TFLITE_SOURCE_DIR}/schema/schema_utils.cc
   ${TFLITE_SOURCE_DIR}/schema/schema_generated.h
 )
-add_library(tensorflow-lite
+
+if(${TFLITE_BUILD_SHARED_LIB})
+  set(LIB_TYPE "SHARED")
+endif()
+
+add_library(tensorflow-lite ${LIB_TYPE}
   ${_ALL_TFLITE_SRCS}
 )
+
+if (TFLITE_BUILD_SHARED_LIB)
+  #TODO: Add branch for windows (based on bazel - export all symbols)
+  if (APPLE)
+    target_link_options(tensorflow-lite PRIVATE "-Wl,-exported_symbols_list,${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/tflite_exported_symbols.lds")
+  else ()
+    target_link_options(tensorflow-lite PRIVATE "-Wl,-z,defs")
+    target_link_options(tensorflow-lite PRIVATE "-Wl,--version-script,${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/tflite_version_script.lds")
+  endif()
+endif()
+
+# set_target_properties(tensorflow-lite
+#     PROPERTIES
+#         VERSION 2.11.0
+#         SOVERSION 2.11.0
+# )
+
 set(_ALL_TFLITE_HDRS ${_ALL_TFLITE_SRCS})
 list(FILTER _ALL_TFLITE_HDRS INCLUDE REGEX ".*\\.h$")
 target_include_directories(tensorflow-lite
