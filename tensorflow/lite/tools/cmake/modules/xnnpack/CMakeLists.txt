@@ -24,6 +24,15 @@ foreach(FLAG IN ITEMS CMAKE_ASM_FLAGS CMAKE_ASM_COMPILER_ARG1 CMAKE_C_FLAGS CMAK
   if(${FLAG})
     string(REGEX REPLACE "-mcpu=[-a-zA-Z0-9_.^$*+?]*" "" _tmp ${${FLAG}})
     set(${FLAG} ${_tmp})
+
+    string(REGEX REPLACE "-mtune=[-a-zA-Z0-9_.^$*+?]*" "" _tmp ${${FLAG}})
+    set(${FLAG} ${_tmp})
+
+    string(REGEX REPLACE "-march=[-a-zA-Z0-9_.^$*+?]*" "" _tmp ${${FLAG}})
+    set(${FLAG} ${_tmp})
+
+    string(REGEX REPLACE "-mfpu=[-a-zA-Z0-9_.^$*+?]*" "" _tmp ${${FLAG}})
+    set(${FLAG} ${_tmp})
   endif()
 endforeach()
 

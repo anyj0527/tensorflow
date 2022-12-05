@@ -20,28 +20,28 @@ endif()
 include(FetchContent)
 
 OverridableFetchContent_Declare(
-  cpuinfo
-  URL "${TENSORFLOW_SOURCE_DIR}/externals/cpuinfo.tar.gz"
+  cpuinfo-xnnpack
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/cpuinfo-xnnpack.tar.gz"
   PREFIX "${CMAKE_BINARY_DIR}"
-  SOURCE_DIR "${CMAKE_BINARY_DIR}/cpuinfo"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/cpuinfo-xnnpack"
 )
-OverridableFetchContent_GetProperties(cpuinfo)
-if(NOT cpuinfo_POPULATED)
-  OverridableFetchContent_Populate(cpuinfo)
+OverridableFetchContent_GetProperties(cpuinfo-xnnpack)
+if(NOT cpuinfo-xnnpack_POPULATED)
+  OverridableFetchContent_Populate(cpuinfo-xnnpack)
 endif()
-set(CPUINFO_SOURCE_DIR "${CMAKE_BINARY_DIR}/cpuinfo")
+set(CPUINFO_SOURCE_DIR "${CMAKE_BINARY_DIR}/cpuinfo-xnnpack")
 
 OverridableFetchContent_Declare(
-  clog
-  URL "${TENSORFLOW_SOURCE_DIR}/externals/clog.tar.gz"
+  clog-xnnpack
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/clog-xnnpack.tar.gz"
   PREFIX "${CMAKE_BINARY_DIR}"
-  SOURCE_DIR "${CMAKE_BINARY_DIR}/clog"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/clog-xnnpack"
 )
-OverridableFetchContent_GetProperties(clog)
-if(NOT clog_POPULATED)
-  OverridableFetchContent_Populate(clog)
+OverridableFetchContent_GetProperties(clog-xnnpack)
+if(NOT clog-xnnpack_POPULATED)
+  OverridableFetchContent_Populate(clog-xnnpack)
 endif()
-set(CLOG_SOURCE_DIR "${CMAKE_BINARY_DIR}/clog")
+set(CLOG_SOURCE_DIR "${CMAKE_BINARY_DIR}/clog-xnnpack")
 
 OverridableFetchContent_Declare(
   fp16

@@ -13,18 +13,22 @@ Source2004:     fxdiv.tar.gz
 Source2005:     opencl_headers.tar.gz
 Source2006:     pthreadpool.tar.gz
 Source2007:     XNNPACK.tar.gz
-Source2008:     clog.tar.gz
-Source2009:     eigen.tar.gz
-Source2010:     flatbuffers.tar.gz
-Source2011:     gemmlowp.tar.gz
-Source2012:     opengl_headers.tar.gz
-Source2013:     ruy.tar.gz
-Source2014:     cpuinfo.tar.gz
-Source2015:     farmhash.tar.gz
-Source2016:     fp16.tar.gz
-Source2017:     neon2sse.tar.gz
-Source2018:     psimd.tar.gz
-Source2019:     vulkan_headers.tar.gz
+# from https://github.com/anyj0527/XNNPACK/commit/72c14f4ed54239d62a2769b14b570be70edc8a7a
+Source2008:     XNNPACK-armv7l.tar.gz
+Source2009:     clog.tar.gz
+Source2010:     eigen.tar.gz
+Source2011:     flatbuffers.tar.gz
+Source2012:     gemmlowp.tar.gz
+Source2013:     opengl_headers.tar.gz
+Source2014:     ruy.tar.gz
+Source2015:     cpuinfo.tar.gz
+Source2016:     farmhash.tar.gz
+Source2017:     fp16.tar.gz
+Source2018:     neon2sse.tar.gz
+Source2019:     psimd.tar.gz
+Source2020:     vulkan_headers.tar.gz
+Source2021:     cpuinfo-xnnpack.tar.gz
+Source2022:     clog-xnnpack.tar.gz
 
 BuildRequires: cmake
 BuildRequires: ninja
@@ -77,8 +81,14 @@ cp %{SOURCE2003} .
 cp %{SOURCE2004} .
 cp %{SOURCE2005} .
 cp %{SOURCE2006} .
+
+# detect armv7l
+%ifarch armv7l
+cp %{SOURCE2008} ./XNNPACK.tar.gz
+%else
 cp %{SOURCE2007} .
-cp %{SOURCE2008} .
+%endif
+
 cp %{SOURCE2009} .
 cp %{SOURCE2010} .
 cp %{SOURCE2011} .
@@ -90,6 +100,9 @@ cp %{SOURCE2016} .
 cp %{SOURCE2017} .
 cp %{SOURCE2018} .
 cp %{SOURCE2019} .
+cp %{SOURCE2020} .
+cp %{SOURCE2021} .
+cp %{SOURCE2022} .
 popd
 
 %build
@@ -109,14 +122,10 @@ EXTRA_CXXFLAGS="${CXXFLAGS}"
   %ifarch armv7l
     EXTRA_CFLAGS="${EXTRA_CFLAGS} -mfloat-abi=softfp -march=armv7-a -mfpu=neon-vfpv4 -funsafe-math-optimizations -mfp16-format=ieee"
     EXTRA_CXXFLAGS="${EXTRA_CXXFLAGS} -mfloat-abi=softfp -march=armv7-a -mfpu=neon-vfpv4 -funsafe-math-optimizations -mfp16-format=ieee"
-    # To build XNNPACK in 32bit, I guess, recent version of GCC is required.
-    %define USE_XNNPACK "OFF"
   %endif
   %ifarch armv7hl
     EXTRA_CFLAGS="${EXTRA_CFLAGS} -mfloat-abi=hard -march=armv7-a -mfpu=neon-vfpv4 -funsafe-math-optimizations -mfp16-format=ieee"
     EXTRA_CXXFLAGS="${EXTRA_CXXFLAGS} -mfloat-abi=hard -march=armv7-a -mfpu=neon-vfpv4 -funsafe-math-optimizations -mfp16-format=ieee"
-    # To build XNNPACK in 32bit, I guess, recent version of GCC is required.
-    %define USE_XNNPACK "OFF"
   %endif
 %endif
 
