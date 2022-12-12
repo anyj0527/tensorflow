@@ -1,0 +1,5 @@
+tensorflow2 (2.11.0) unstable focal jammy; urgency=medium
+
+  * Added a debian packaging to support version 2.11.0 of TensorFlow Lite
+
+ -- Yongjoo Ahn <yongjoo1.ahn@samsung.com>  Mon, 5 Dec 2022 10:00:00 +0900
