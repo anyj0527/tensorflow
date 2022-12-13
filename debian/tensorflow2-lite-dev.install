@@ -2,3 +2,4 @@
 /usr/include/tensorflow2/*
 /usr/lib/libtensorflow2-lite.a
 /usr/lib/pkgconfig/tensorflow2-lite.pc
+/usr/bin/tflite_benchmark_model

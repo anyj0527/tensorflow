@@ -60,6 +60,14 @@ Requires: tensorflow2-lite-devel = %{version}-%{release}
 %description lite-flatbuf-schema
 TensorFlow Lite schema file
 
+%ifnarch %arm
+%package lite-util
+Summary: TensorFlow Lite developer util
+
+%description lite-util
+It includes a executable to benchmark any tflite model
+%endif
+
 %define USE_XNNPACK   "ON"
 %define USE_OPENCL    "ON"
 %define SHARED_LIB    "OFF"
@@ -147,6 +155,10 @@ cmake \
 
 cmake --build . %{?_smp_mflags}
 
+%ifnarch %arm
+  cmake --build . %{?_smp_mflags} -t benchmark_model
+%endif
+
 popd
 
 %install
@@ -165,11 +177,15 @@ sed -i 's:@libdir@:%{_libdir}:g
     s:@includedir@:%{_includedir}/tensorflow2/:g' ./tensorflow2-lite.pc.in
 
 # Put the generated files into the buildroot folder
-## install built static library
+## install built static library and benchmark binary
 %if %{SHARED_LIB} == "ON"
   install -m 0644 ./build/libtensorflow-lite.so %{buildroot}%{_libdir}/libtensorflow2-lite.so
 %else
   install -m 0644 ./build/libtensorflow-lite-bundled.a %{buildroot}%{_libdir}/libtensorflow2-lite.a
+%endif
+
+%ifnarch %arm
+  install -m 0655 ./build/tools/benchmark/benchmark_model %{buildroot}%{_bindir}/tflite_benchmark_model
 %endif
 
 ## install headers
@@ -211,6 +227,10 @@ install -m 0644 tensorflow2-lite.pc.in %{buildroot}%{_libdir}/pkgconfig/tensorfl
 %files lite-flatbuf-schema
 %{_datadir}/tensorflow2/lite/schema/schema.fbs
 
+%ifnarch %arm
+%files lite-util
+%{_bindir}/tflite_benchmark_model
+%endif
 
 %changelog
 * Mon Nov 28 2022 Yongjoo Ahn <yongjoo1.ahn@samsung.com>

@@ -39,7 +39,8 @@ override_dh_auto_configure:
 
 override_dh_auto_build:
 	cd $(BUILDDIR) && \
-		cmake --build .
+		cmake --build . && \
+		cmake --build . -t benchmark_model
 
 override_dh_auto_install:
 	mkdir -p ${DESTDIR}
@@ -56,6 +57,7 @@ override_dh_auto_install:
 	sed -i 's:@includedir@:${_includedir}/tensorflow2/:g' ./tensorflow2-lite.pc.in
 
 	install -m 0644 ./build/libtensorflow-lite-bundled.a ${DESTDIR}${_libdir}/libtensorflow2-lite.a
+	install -m 0655 ./build/tools/benchmark/benchmark_model ${DESTDIR}${_bindir}/tflite_benchmark_model
 
 ## install headers
 	cd tensorflow/lite && find . -name "*.h" -type f -exec cp --parents {} ${DESTDIR}${_includedir}/tensorflow2/lite \;
