@@ -20,11 +20,72 @@ endif()
 include(OverridableFetchContent)
 
 OverridableFetchContent_Declare(
+  cpuinfo-xnnpack
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/cpuinfo-xnnpack.tar.gz"
+  PREFIX "${CMAKE_BINARY_DIR}"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/cpuinfo-xnnpack"
+)
+OverridableFetchContent_GetProperties(cpuinfo-xnnpack)
+if(NOT cpuinfo-xnnpack_POPULATED)
+  OverridableFetchContent_Populate(cpuinfo-xnnpack)
+endif()
+set(CPUINFO_SOURCE_DIR "${CMAKE_BINARY_DIR}/cpuinfo-xnnpack")
+
+OverridableFetchContent_Declare(
+  fp16
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/fp16.tar.gz"
+  PREFIX "${CMAKE_BINARY_DIR}"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/fp16"
+)
+OverridableFetchContent_GetProperties(fp16)
+if(NOT fp16_POPULATED)
+  OverridableFetchContent_Populate(fp16)
+endif()
+set(FP16_SOURCE_DIR "${CMAKE_BINARY_DIR}/fp16")
+
+OverridableFetchContent_Declare(
+  psimd
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/psimd.tar.gz"
+  PREFIX "${CMAKE_BINARY_DIR}"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/psimd"
+)
+OverridableFetchContent_GetProperties(psimd)
+if(NOT psimd_POPULATED)
+  OverridableFetchContent_Populate(psimd)
+endif()
+set(PSIMD_SOURCE_DIR "${CMAKE_BINARY_DIR}/psimd")
+
+OverridableFetchContent_Declare(
+  fxdiv
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/fxdiv.tar.gz"
+  PREFIX "${CMAKE_BINARY_DIR}"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/fxdiv"
+)
+OverridableFetchContent_GetProperties(fxdiv)
+if(NOT fxdiv_POPULATED)
+  OverridableFetchContent_Populate(fxdiv)
+endif()
+set(FXDIV_SOURCE_DIR "${CMAKE_BINARY_DIR}/fxdiv")
+
+OverridableFetchContent_Declare(
+  pthreadpool
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/pthreadpool.tar.gz"
+  PREFIX "${CMAKE_BINARY_DIR}"
+  SOURCE_DIR "${CMAKE_BINARY_DIR}/pthreadpool-xnnpack"
+)
+OverridableFetchContent_GetProperties(pthreadpool)
+if(NOT pthreadpool_POPULATED)
+  OverridableFetchContent_Populate(pthreadpool)
+endif()
+set(PTHREADPOOL_SOURCE_DIR "${CMAKE_BINARY_DIR}/pthreadpool-xnnpack")
+
+OverridableFetchContent_Declare(
   xnnpack
-  GIT_REPOSITORY https://github.com/google/XNNPACK
-  # Sync with tensorflow/workspace2.bzl
-  GIT_TAG bbbaa7352a3ea729987d3e654d37be93e8009691
-  GIT_PROGRESS TRUE
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/xnnpack.tar.gz"
+  # GIT_REPOSITORY https://github.com/google/XNNPACK
+  # # Sync with tensorflow/workspace2.bzl
+  # GIT_TAG bbbaa7352a3ea729987d3e654d37be93e8009691
+  # GIT_PROGRESS TRUE
   PREFIX "${CMAKE_BINARY_DIR}"
   SOURCE_DIR "${CMAKE_BINARY_DIR}/xnnpack"
 )
@@ -49,5 +110,5 @@ include_directories(
    "${PTHREADPOOL_SOURCE_DIR}/include"
    "${FP16_SOURCE_DIR}/include"
    "${XNNPACK_SOURCE_DIR}/include"
-   "${CPUINFO_SOURCE_DIR}/"
+   "${CPUINFO-XNNPACK_SOURCE_DIR}/"
 )

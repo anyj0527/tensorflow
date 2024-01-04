@@ -21,15 +21,16 @@ include(OverridableFetchContent)
 
 OverridableFetchContent_Declare(
   gemmlowp
-  GIT_REPOSITORY https://github.com/google/gemmlowp
-  # Sync with tensorflow/third_party/gemmlowp/workspace.bzl
-  GIT_TAG e844ffd17118c1e17d94e1ba4354c075a4577b88
-  # It's not currently (cmake 3.17) possible to shallow clone with a GIT TAG
-  # as cmake attempts to git checkout the commit hash after the clone
-  # which doesn't work as it's a shallow clone hence a different commit hash.
-  # https://gitlab.kitware.com/cmake/cmake/-/issues/17770
-  # GIT_SHALLOW TRUE
-  GIT_PROGRESS TRUE
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/gemmlowp.tar.gz"
+  # GIT_REPOSITORY https://github.com/google/gemmlowp
+  # # Sync with tensorflow/third_party/gemmlowp/workspace.bzl
+  # GIT_TAG e844ffd17118c1e17d94e1ba4354c075a4577b88
+  # # It's not currently (cmake 3.17) possible to shallow clone with a GIT TAG
+  # # as cmake attempts to git checkout the commit hash after the clone
+  # # which doesn't work as it's a shallow clone hence a different commit hash.
+  # # https://gitlab.kitware.com/cmake/cmake/-/issues/17770
+  # # GIT_SHALLOW TRUE
+  # GIT_PROGRESS TRUE
   SOURCE_DIR "${CMAKE_BINARY_DIR}/gemmlowp"
 )
 

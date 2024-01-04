@@ -21,15 +21,16 @@ include(OverridableFetchContent)
 
 OverridableFetchContent_Declare(
   eigen
-  GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
-  # Sync with tensorflow/third_party/eigen3/workspace.bzl
-  GIT_TAG 66e8f38891841bf88ee976a316c0c78a52f0cee5
-  # It's not currently (cmake 3.17) possible to shallow clone with a GIT TAG
-  # as cmake attempts to git checkout the commit hash after the clone
-  # which doesn't work as it's a shallow clone hence a different commit hash.
-  # https://gitlab.kitware.com/cmake/cmake/-/issues/17770
-  # GIT_SHALLOW TRUE
-  GIT_PROGRESS TRUE
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/eigen.tar.gz"
+  # GIT_REPOSITORY https://gitlab.com/libeigen/eigen.git
+  # # Sync with tensorflow/third_party/eigen3/workspace.bzl
+  # GIT_TAG 66e8f38891841bf88ee976a316c0c78a52f0cee5
+  # # It's not currently (cmake 3.17) possible to shallow clone with a GIT TAG
+  # # as cmake attempts to git checkout the commit hash after the clone
+  # # which doesn't work as it's a shallow clone hence a different commit hash.
+  # # https://gitlab.kitware.com/cmake/cmake/-/issues/17770
+  # # GIT_SHALLOW TRUE
+  # GIT_PROGRESS TRUE
   PREFIX "${CMAKE_BINARY_DIR}"
   SOURCE_DIR "${CMAKE_BINARY_DIR}/eigen"
   LICENSE_FILE "COPYING.MPL2"

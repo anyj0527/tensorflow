@@ -21,11 +21,12 @@ include(OverridableFetchContent)
 
 OverridableFetchContent_Declare(
   flatbuffers
-  GIT_REPOSITORY https://github.com/google/flatbuffers
-  # Sync with tensorflow/third_party/flatbuffers/workspace.bzl
-  GIT_TAG v23.5.26
-  GIT_SHALLOW TRUE
-  GIT_PROGRESS TRUE
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/flatbuffers.tar.gz"
+  # GIT_REPOSITORY https://github.com/google/flatbuffers
+  # # Sync with tensorflow/third_party/flatbuffers/workspace.bzl
+  # GIT_TAG v23.5.26
+  # GIT_SHALLOW TRUE
+  # GIT_PROGRESS TRUE
   SOURCE_DIR "${CMAKE_BINARY_DIR}/flatbuffers"
 )
 

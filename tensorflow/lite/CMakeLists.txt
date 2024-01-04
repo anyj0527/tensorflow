@@ -141,7 +141,7 @@ macro(populate_tf_source_vars RELATIVE_DIR SOURCES_VAR)
   )
 endmacro()
 # Make sure all repos have licenses.
-set(OVERRIDABLE_FETCH_CONTENT_LICENSE_CHECK ON)
+set(OVERRIDABLE_FETCH_CONTENT_LICENSE_CHECK OFF)
 # Additional library dependencies based upon enabled features.
 set(TFLITE_TARGET_DEPENDENCIES "")
 # Find TensorFlow Lite dependencies.
@@ -151,10 +151,12 @@ find_package(farmhash REQUIRED)
 find_package(fft2d REQUIRED)
 find_package(FlatBuffers REQUIRED)
 find_package(gemmlowp REQUIRED)
-if (NOT CMAKE_SYSTEM_PROCESSOR OR CMAKE_SYSTEM_PROCESSOR MATCHES "x86")
+
+# if (NOT CMAKE_SYSTEM_PROCESSOR OR CMAKE_SYSTEM_PROCESSOR MATCHES "x86")
   find_package(NEON_2_SSE REQUIRED)
   list(APPEND TFLITE_TARGET_DEPENDENCIES NEON_2_SSE::NEON_2_SSE)
-endif()
+# endif()
+
 find_package(cpuinfo REQUIRED)  #CPUINFO is used by XNNPACK and RUY library
 find_package(ml_dtypes REQUIRED)
 find_package(ruy REQUIRED)
@@ -162,6 +164,9 @@ find_package(ruy REQUIRED)
 include_directories(
   ${TSL_SOURCE_DIR}
 )
+
+find_package(pthreadpool REQUIRED)
+
 # Download necessary dependencies.
 # Download pthreadpool source package if it doesn't exist.
 if(SYSTEM_PTHREADPOOL)

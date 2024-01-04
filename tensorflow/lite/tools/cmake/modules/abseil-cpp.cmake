@@ -22,11 +22,12 @@ include(OverridableFetchContent)
 
 OverridableFetchContent_Declare(
   abseil-cpp
-  GIT_REPOSITORY https://github.com/abseil/abseil-cpp
-  # Sync with tensorflow/third_party/absl/workspace.bzl
-  GIT_TAG b971ac5250ea8de900eae9f95e06548d14cd95fe
-  GIT_SHALLOW TRUE
-  GIT_PROGRESS TRUE
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/abseil-cpp.tar.gz"
+  # GIT_REPOSITORY https://github.com/abseil/abseil-cpp
+  # # Sync with tensorflow/third_party/absl/workspace.bzl
+  # GIT_TAG b971ac5250ea8de900eae9f95e06548d14cd95fe
+  # GIT_SHALLOW TRUE
+  # GIT_PROGRESS TRUE
   PREFIX "${CMAKE_BINARY_DIR}"
   SOURCE_DIR "${CMAKE_BINARY_DIR}/abseil-cpp"
 )
