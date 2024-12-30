@@ -17,10 +17,11 @@ include(OverridableFetchContent)
 
 OverridableFetchContent_Declare(
   protobuf
-  GIT_REPOSITORY https://github.com/protocolbuffers/protobuf
-  # Sync with tensorflow/third_party/protobuf/protobuf.patch
-  GIT_TAG 90b73ac3f0b10320315c2ca0d03a5a9b095d2f66
-  GIT_PROGRESS TRUE
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/protobuf.tar.gz"
+  # GIT_REPOSITORY https://github.com/protocolbuffers/protobuf
+  # # Sync with tensorflow/third_party/protobuf/protobuf.patch
+  # GIT_TAG 90b73ac3f0b10320315c2ca0d03a5a9b095d2f66
+  # GIT_PROGRESS TRUE
   PREFIX "${CMAKE_BINARY_DIR}"
   SOURCE_DIR "${CMAKE_BINARY_DIR}/protobuf"
 )
