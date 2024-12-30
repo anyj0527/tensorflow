@@ -21,12 +21,13 @@ include(OverridableFetchContent)
 
 OverridableFetchContent_Declare(
   flatbuffers
-  GIT_REPOSITORY https://github.com/google/flatbuffers
-  # Sync with tensorflow/third_party/flatbuffers/workspace.bzl
-  GIT_TAG e6463926479bd6b330cbcf673f7e917803fd5831
-  # NOTE: b/340264458 - `GIT_SHALLOW TRUE` works for tag name only.
-  GIT_SHALLOW FALSE
-  GIT_PROGRESS TRUE
+  URL "${TENSORFLOW_SOURCE_DIR}/externals/flatbuffers.tar.gz"
+  # GIT_REPOSITORY https://github.com/google/flatbuffers
+  # # Sync with tensorflow/third_party/flatbuffers/workspace.bzl
+  # GIT_TAG e6463926479bd6b330cbcf673f7e917803fd5831
+  # # NOTE: b/340264458 - `GIT_SHALLOW TRUE` works for tag name only.
+  # GIT_SHALLOW FALSE
+  # GIT_PROGRESS TRUE
   SOURCE_DIR "${CMAKE_BINARY_DIR}/flatbuffers"
 )
 
@@ -66,11 +67,11 @@ if(NOT DEFINED FLATC_INSTALL_PREFIX)
   set(FLATC_INSTALL_PREFIX <INSTALL_DIR> CACHE PATH "Flatc installation directory")
 endif()
 
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNOMINMAX=1")
 ExternalProject_Add(flatbuffers-flatc
   PREFIX ${CMAKE_BINARY_DIR}/flatbuffers-flatc
   SOURCE_DIR ${flatbuffers_SOURCE_DIR}
-  CMAKE_ARGS -DCMAKE_CXX_FLAGS="-DNOMINMAX=1"
-             -DFLATBUFFERS_BUILD_TESTS=OFF
+  CMAKE_ARGS -DFLATBUFFERS_BUILD_TESTS=OFF
              -DFLATBUFFERS_BUILD_FLATLIB=OFF
              -DFLATBUFFERS_STATIC_FLATC=OFF
              -DFLATBUFFERS_BUILD_FLATHASH=OFF
