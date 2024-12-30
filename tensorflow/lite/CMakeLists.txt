@@ -101,6 +101,8 @@ else()
   set(FLATC_TARGET "flatbuffers-flatc")
 endif()
 
+option(TFLITE_BUILD_SHARED_LIB "Build shared library instead of static" ON)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(_TFLITE_ENABLE_RUY "${TFLITE_ENABLE_RUY}")
@@ -159,7 +161,7 @@ macro(populate_tf_source_vars RELATIVE_DIR SOURCES_VAR)
   )
 endmacro()
 # Make sure all repos have licenses.
-set(OVERRIDABLE_FETCH_CONTENT_LICENSE_CHECK ON)
+set(OVERRIDABLE_FETCH_CONTENT_LICENSE_CHECK OFF)
 # Additional library dependencies based upon enabled features.
 set(TFLITE_TARGET_DEPENDENCIES "")
 # Find TensorFlow Lite dependencies.
@@ -181,31 +183,33 @@ include_directories(
   ${TSL_SOURCE_DIR}
   ${XLA_SOURCE_DIR}
 )
-# Download necessary dependencies.
-if(TFLITE_ENABLE_XNNPACK)
-  # pthreadpool is used by XNNPACK.
-  if(SYSTEM_PTHREADPOOL)
-    find_library(PTHREADPOOL_LIB pthreadpool REQUIRED)
-  elseif(NOT DEFINED PTHREADPOOL_SOURCE_DIR)
-      message(STATUS "Downloading pthreadpool to ${CMAKE_BINARY_DIR}/pthreadpool-source (define SYSTEM_PTHREADPOOL or PTHREADPOOL_SOURCE_DIR to avoid it)")
-      configure_file(cmake/DownloadPThreadPool.cmake "${CMAKE_BINARY_DIR}/pthreadpool-download/CMakeLists.txt")
-      execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
-        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pthreadpool-download")
-      execute_process(COMMAND "${CMAKE_COMMAND}" --build .
-        WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pthreadpool-download")
-      set(PTHREADPOOL_SOURCE_DIR "${CMAKE_BINARY_DIR}/pthreadpool-source" CACHE STRING "pthreadpool source directory")
-  endif()
-  # Configure pthreadpool
-  if(NOT SYSTEM_PTHREADPOOL AND NOT TARGET pthreadpool)
-    set(PTHREADPOOL_BUILD_TESTS OFF CACHE BOOL "")
-    set(PTHREADPOOL_BUILD_BENCHMARKS OFF CACHE BOOL "")
-    set(PTHREADPOOL_ALLOW_DEPRECATED_API OFF CACHE BOOL "")
-    add_subdirectory(
-      "${PTHREADPOOL_SOURCE_DIR}"
-      "${CMAKE_BINARY_DIR}/pthreadpool")
-  endif()
-  list(APPEND TFLITE_TARGET_DEPENDENCIES pthreadpool)
-endif()
+
+## Disable unnecessary build process
+# # Download necessary dependencies.
+# if(TFLITE_ENABLE_XNNPACK)
+#   # pthreadpool is used by XNNPACK.
+#   if(SYSTEM_PTHREADPOOL)
+#     find_library(PTHREADPOOL_LIB pthreadpool REQUIRED)
+#   elseif(NOT DEFINED PTHREADPOOL_SOURCE_DIR)
+#       message(STATUS "Downloading pthreadpool to ${CMAKE_BINARY_DIR}/pthreadpool-source (define SYSTEM_PTHREADPOOL or PTHREADPOOL_SOURCE_DIR to avoid it)")
+#       configure_file(cmake/DownloadPThreadPool.cmake "${CMAKE_BINARY_DIR}/pthreadpool-download/CMakeLists.txt")
+#       execute_process(COMMAND "${CMAKE_COMMAND}" -G "${CMAKE_GENERATOR}" .
+#         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pthreadpool-download")
+#       execute_process(COMMAND "${CMAKE_COMMAND}" --build .
+#         WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/pthreadpool-download")
+#       set(PTHREADPOOL_SOURCE_DIR "${CMAKE_BINARY_DIR}/pthreadpool-source" CACHE STRING "pthreadpool source directory")
+#   endif()
+#   # Configure pthreadpool
+#   if(NOT SYSTEM_PTHREADPOOL AND NOT TARGET pthreadpool)
+#     set(PTHREADPOOL_BUILD_TESTS OFF CACHE BOOL "")
+#     set(PTHREADPOOL_BUILD_BENCHMARKS OFF CACHE BOOL "")
+#     set(PTHREADPOOL_ALLOW_DEPRECATED_API OFF CACHE BOOL "")
+#     add_subdirectory(
+#       "${PTHREADPOOL_SOURCE_DIR}"
+#       "${CMAKE_BINARY_DIR}/pthreadpool")
+#   endif()
+#   list(APPEND TFLITE_TARGET_DEPENDENCIES pthreadpool)
+# endif()
 set(TF_TARGET_PRIVATE_OPTIONS "")
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang$")
   # TensorFlow uses a heap of deprecated proto fields so surpress these
@@ -650,6 +654,7 @@ set(_ALL_TFLITE_SRCS
   ${TFLITE_DELEGATES_GPU_SRCS}
   ${TFLITE_DELEGATES_NNAPI_SRCS}
   ${TFLITE_DELEGATES_SRCS}
+  # ${TFLITE_DELEGATES_XNNPACK_SRCS}
   ${TFLITE_DELEGATES_EXTERNAL_SRCS}
   ${TFLITE_EXPERIMENTAL_REMAT_SRCS}
   ${TFLITE_EXPERIMENTAL_RESOURCE_SRCS}
@@ -670,6 +675,7 @@ set(_ALL_TFLITE_SRCS
   ${TFLITE_SOURCE_DIR}/internal/signature_def.h
   ${TFLITE_SOURCE_DIR}/kernels/internal/utils/sparsity_format_converter.cc
   ${TFLITE_SOURCE_DIR}/schema/conversion_metadata_generated.h
+  # ${TFLITE_SOURCE_DIR}/schema/schema_utils.cc
   ${TFLITE_SOURCE_DIR}/schema/schema_generated.h
   ${TF_SOURCE_DIR}/compiler/mlir/lite/schema/schema_utils.cc
   ${TF_SOURCE_DIR}/compiler/mlir/lite/schema/schema_generated.h
@@ -697,9 +703,26 @@ else()
   list(FILTER _ALL_TFLITE_SRCS EXCLUDE REGEX ".*mmap_allocation\\.cc$")
 endif()
 
-add_library(tensorflow-lite
+if(${TFLITE_BUILD_SHARED_LIB})
+  set(LIB_TYPE "SHARED")
+else()
+  set(LIB_TYPE "STATIC")
+endif()
+
+add_library(tensorflow-lite ${LIB_TYPE}
   ${_ALL_TFLITE_SRCS}
 )
+
+if (TFLITE_BUILD_SHARED_LIB)
+  # TODO: Add branch for windows (based on bazel - export all symbols)
+  if (APPLE)
+    target_link_options(tensorflow-lite PRIVATE "-Wl,-exported_symbols_list,${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/tflite_exported_symbols.lds")
+  else ()
+    target_link_options(tensorflow-lite PRIVATE "-Wl,--no-undefined")
+    target_link_options(tensorflow-lite PRIVATE "-Wl,--version-script,${TENSORFLOW_SOURCE_DIR}/tensorflow/lite/tflite_version_script.lds")
+  endif()
+endif()
+
 set(_ALL_TFLITE_HDRS ${_ALL_TFLITE_SRCS})
 list(FILTER _ALL_TFLITE_HDRS INCLUDE REGEX ".*\\.h$")
 target_include_directories(tensorflow-lite
@@ -726,6 +749,106 @@ target_link_libraries(tensorflow-lite
 
 if (NOT BUILD_SHARED_LIBS)
   list(APPEND TFLITE_TARGET_PUBLIC_OPTIONS "-DTFL_STATIC_LIBRARY_BUILD")
+endif()
+
+# The libtensorflow-lite.a isn't self-contained since all the transitive dependencies are not included.
+# Let libtensorflow-lite-bundled.a contains all the deps.
+# The bundling snippet is from https://cristianadam.eu/20190501/bundling-together-static-libraries-with-cmake/
+function(bundle_static_library tgt_name bundled_tgt_name)
+  list(APPEND static_libs ${tgt_name})
+
+  function(_recursively_collect_dependencies input_target)
+    set(_input_link_libraries LINK_LIBRARIES)
+    get_target_property(_input_type ${input_target} TYPE)
+    if (${_input_type} STREQUAL "INTERFACE_LIBRARY")
+      set(_input_link_libraries INTERFACE_LINK_LIBRARIES)
+    endif()
+    get_target_property(public_dependencies ${input_target} ${_input_link_libraries})
+    foreach(dependency IN LISTS public_dependencies)
+      if(TARGET ${dependency})
+        get_target_property(alias ${dependency} ALIASED_TARGET)
+        if (TARGET ${alias})
+          set(dependency ${alias})
+        endif()
+        get_target_property(_type ${dependency} TYPE)
+        if (${_type} STREQUAL "STATIC_LIBRARY")
+          list(APPEND static_libs ${dependency})
+        endif()
+
+        get_property(library_already_added
+          GLOBAL PROPERTY _${tgt_name}_static_bundle_${dependency})
+        if (NOT library_already_added)
+          set_property(GLOBAL PROPERTY _${tgt_name}_static_bundle_${dependency} ON)
+          _recursively_collect_dependencies(${dependency})
+        endif()
+      endif()
+    endforeach()
+    set(static_libs ${static_libs} PARENT_SCOPE)
+  endfunction()
+
+  _recursively_collect_dependencies(${tgt_name})
+
+  list(REMOVE_DUPLICATES static_libs)
+
+  set(bundled_tgt_full_name
+    ${CMAKE_BINARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}${bundled_tgt_name}${CMAKE_STATIC_LIBRARY_SUFFIX})
+
+  if (CMAKE_CXX_COMPILER_ID MATCHES "^(Clang|GNU)$")
+    file(WRITE ${CMAKE_BINARY_DIR}/${bundled_tgt_name}.ar.in
+      "CREATE ${bundled_tgt_full_name}\n" )
+
+    foreach(tgt IN LISTS static_libs)
+      file(APPEND ${CMAKE_BINARY_DIR}/${bundled_tgt_name}.ar.in
+        "ADDLIB $<TARGET_FILE:${tgt}>\n")
+    endforeach()
+
+    file(APPEND ${CMAKE_BINARY_DIR}/${bundled_tgt_name}.ar.in "SAVE\n")
+    file(APPEND ${CMAKE_BINARY_DIR}/${bundled_tgt_name}.ar.in "END\n")
+
+    file(GENERATE
+      OUTPUT ${CMAKE_BINARY_DIR}/${bundled_tgt_name}.ar
+      INPUT ${CMAKE_BINARY_DIR}/${bundled_tgt_name}.ar.in)
+
+    set(ar_tool ${CMAKE_AR})
+    if (CMAKE_INTERPROCEDURAL_OPTIMIZATION)
+      set(ar_tool ${CMAKE_CXX_COMPILER_AR})
+    endif()
+
+    add_custom_command(
+      COMMAND ${ar_tool} -M < ${CMAKE_BINARY_DIR}/${bundled_tgt_name}.ar
+      OUTPUT ${bundled_tgt_full_name}
+      COMMENT "Bundling ${bundled_tgt_name}"
+      VERBATIM)
+  elseif(MSVC)
+    find_program(lib_tool lib)
+
+    foreach(tgt IN LISTS static_libs)
+      list(APPEND static_libs_full_names $<TARGET_FILE:${tgt}>)
+    endforeach()
+
+    add_custom_command(
+      COMMAND ${lib_tool} /NOLOGO /OUT:${bundled_tgt_full_name} ${static_libs_full_names}
+      OUTPUT ${bundled_tgt_full_name}
+      COMMENT "Bundling ${bundled_tgt_name}"
+      VERBATIM)
+  else()
+    message(FATAL_ERROR "Unknown bundle scenario!")
+  endif()
+
+  add_custom_target(bundling_target ALL DEPENDS ${bundled_tgt_full_name})
+  add_dependencies(bundling_target ${tgt_name})
+
+  add_library(${bundled_tgt_name} STATIC IMPORTED)
+  set_target_properties(${bundled_tgt_name}
+    PROPERTIES
+      IMPORTED_LOCATION ${bundled_tgt_full_name}
+      INTERFACE_INCLUDE_DIRECTORIES $<TARGET_PROPERTY:${tgt_name},INTERFACE_INCLUDE_DIRECTORIES>)
+  add_dependencies(${bundled_tgt_name} bundling_target)
+
+endfunction()
+
+if (NOT ${TFLITE_BUILD_SHARED_LIB})
+  bundle_static_library(tensorflow-lite tensorflow-lite-bundled)
 endif()
 
 target_compile_options(tensorflow-lite
