@@ -34,7 +34,7 @@ Source2022:     xnnpack.tar.gz
 %define USE_CLANG     "ON"
 %define USE_XNNPACK   "ON"
 %define USE_OPENCL    "ON"
-%define SHARED_LIB    "ON"
+%define SHARED_LIB    "OFF"
 
 # clang + armv7hl build fails
 %ifarch armv7hl
